@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:xamarinForm="clr-namespace:XamarinForm;assembly=XamarinForm"
+             x:Class="XamarinForm.Droid.Resources.layout.MainPage">
+  <!--<ContentPage.Resources>
+    <ResourceDictionary>
+      <xamarinForm:MainPage x:Key="MainPageResource"/>
+    </ResourceDictionary>
+  </ContentPage.Resources>-->
+  <ContentPage.Content>
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="50"></RowDefinition>
+        <RowDefinition Height="*"></RowDefinition>
+        <RowDefinition Height="100"></RowDefinition>
+        <RowDefinition Height="*"></RowDefinition>
+      </Grid.RowDefinitions>
+      <Image Source="logo.png" Grid.Row="0" ></Image>
+      <Button x:Name="RunCollect" Text="collect data" Grid.Row="2" HorizontalOptions="FillAndExpand"
+              VerticalOptions="FillAndExpand" IsVisible="{Binding IsButtonVisible}"
+               FontSize="Large" Command="{Binding ExecuteCollectCommand}"></Button>
+      <ActivityIndicator Grid.Row="2" IsRunning="True"
+                         IsVisible="{Binding IsRunningCollect}"/>
+    <ScrollView Grid.Row="3" HeightRequest="10000">
+      <Label x:Name="DataCol" Text="{Binding CollectData}"></Label>
+    </ScrollView>
+    </Grid>
+  </ContentPage.Content>
+</ContentPage>
