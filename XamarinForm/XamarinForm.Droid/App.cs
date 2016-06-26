@@ -13,7 +13,7 @@ namespace XamarinForm.Droid
 
         public App(Context baseContext, PackageManager packageManager)
         {
-            MainPage = new MainPage(baseContext,packageManager);
+            MainPage = new NavigationPage(new MainPage(baseContext,packageManager));
         }
 
         protected override void OnStart()

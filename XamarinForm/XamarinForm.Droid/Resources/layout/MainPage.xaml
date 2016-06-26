@@ -9,22 +9,21 @@
     </ResourceDictionary>
   </ContentPage.Resources>-->
   <ContentPage.Content>
-    <Grid>
+    <Grid Padding="50">
       <Grid.RowDefinitions>
         <RowDefinition Height="50"></RowDefinition>
         <RowDefinition Height="*"></RowDefinition>
         <RowDefinition Height="100"></RowDefinition>
         <RowDefinition Height="*"></RowDefinition>
       </Grid.RowDefinitions>
-      <Image Source="logo.png" Grid.Row="0" ></Image>
+      <Image Source="logo.png" Grid.Row="0"></Image>
       <Button x:Name="RunCollect" Text="collect data" Grid.Row="2" HorizontalOptions="FillAndExpand"
-              VerticalOptions="FillAndExpand" IsVisible="{Binding IsButtonVisible}"
-               FontSize="Large" Command="{Binding ExecuteCollectCommand}"></Button>
+              HeightRequest="80" 
+              VerticalOptions="Center" IsVisible="{Binding IsButtonVisible}"  
+               FontSize="Large" Command="{Binding ExecuteCollectCommand}">
+      </Button>
       <ActivityIndicator Grid.Row="2" IsRunning="True"
                          IsVisible="{Binding IsRunningCollect}"/>
-    <ScrollView Grid.Row="3" HeightRequest="10000">
-      <Label x:Name="DataCol" Text="{Binding CollectData}"></Label>
-    </ScrollView>
     </Grid>
   </ContentPage.Content>
 </ContentPage>
