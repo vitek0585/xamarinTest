@@ -6,28 +6,36 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Database;
 using Android.Provider;
+using Xamarin.Forms;
 using Uri = Android.Net.Uri;
 
 namespace XamarinForm.Droid
 {
     public class CollectEngine
     {
-        private List<string> _collectData = new List<string>();
-        public void GetAllApps(PackageManager packageManager)
-        {
-            _collectData.Add("-------------Apps---------------");
+        private StackLayout _stackLayout;
 
-            var apps = packageManager.GetInstalledApplications(PackageInfoFlags.Activities);
-            var result = apps.Count.ToString();
-            _collectData.Add(result);
+        public CollectEngine()
+        {
+            _stackLayout = new StackLayout()
+            {
+                Orientation = StackOrientation.Vertical
+            };
 
         }
-        public void GetCalendar(ContentResolver contentResolver)
+
+        public void CollectApplications(PackageManager packageManager)
         {
-            _collectData.Add("-------------Calendar event---------------");
+            AddTitle("Applications");
+            var apps = packageManager.GetInstalledApplications(PackageInfoFlags.MatchAll);
+            AddTotalCount(apps.Count);
+
+        }
+        public void CollectCalendarEvents(ContentResolver contentResolver)
+        {
+            AddTitle("Calendar events");
             var calendarUri = CalendarContract.Events.ContentUri;
             var posixTime = DateTime.SpecifyKind(new DateTime(1970, 1, 1), DateTimeKind.Utc);
-
             string[] eventsProjection = {
                             CalendarContract.Events.InterfaceConsts.Title,
                             CalendarContract.Events.InterfaceConsts.Dtstart
@@ -42,25 +50,23 @@ namespace XamarinForm.Droid
                 string title = cur.GetString(cur.GetColumnIndexOrThrow(CalendarContract.Events.InterfaceConsts.Title));
                 string date = cur.GetString(cur.GetColumnIndexOrThrow(CalendarContract.Events.InterfaceConsts.Dtstart));
                 events.Add("Title: " + title + " .Date: " + posixTime.AddMilliseconds(double.Parse(date)).ToShortDateString());
-
             }
-            _collectData.Add($"Calendar {events.Count}");
-
-            //var result = events.Aggregate(new StringBuilder(), (sb, s) => sb.AppendLine(s)).ToString();
-            //_collectData.Add(result);
+            AddTotalCount(events.Count);
         }
 
         public void CallHistory(ContentResolver contentResolver)
         {
-            _collectData.Add("-------------Call history---------------");
+            AddTitle("Calls history");
 
             var callUri = CallLog.Calls.ContentUri;
             var posixTime = DateTime.SpecifyKind(new DateTime(1970, 1, 1), DateTimeKind.Utc);
 
             string[] eventsProjection = {
                CallLog.Calls.Date,
-               CallLog.Calls.Type,//type2 outcoming,type1 incoming,type3 missing
+               CallLog.Calls.Type,
+               //type2 outcoming,type1 incoming,type3 missing
             };
+
             ICursor cur = contentResolver.Query(callUri, eventsProjection, null, null, null);
             var events = new List<string>();
             cur.MoveToFirst();
@@ -81,19 +87,18 @@ namespace XamarinForm.Droid
                         call = "missing";
                         break;
                 }
-                events.Add("Date: " + posixTime.AddMilliseconds(double.Parse(date)).ToShortDateString() + " Type" + call);
+                events.Add(type);
 
             }
-            _collectData.Add($"Call count - {events.Count}");
 
-
-            //var result = events.Aggregate(new StringBuilder(), (sb, s) => sb.AppendLine(s)).ToString();
-            //_collectData.Add(result);
-
+            AddTotalCount($"Total incoming calls - {events.Count(typeCall => typeCall == 1.ToString())}");
+            //AddTotalCount($"Total other - {events.Count(typeCall => Enumerable.Range(1,3).Any(n=>n.ToString()!=typeCall))}");
+            AddTotalCount($"Total outcoming calls - {events.Count(typeCall => typeCall == 2.ToString())}");
+            AddTotalCount($"Total missing calls - {events.Count(typeCall => typeCall == 3.ToString())}");
         }
         public void GetAllSms(ContentResolver contentResolver)
         {
-            _collectData.Add("-------------Sms---------------");
+            AddTitle("Sms");
 
             var sms = new List<string>();
             ICursor cur = contentResolver.Query(Telephony.Sms.ContentUri, null, null, null, null);
@@ -104,20 +109,23 @@ namespace XamarinForm.Droid
                 sms.Add("Sms phone number: " + address);
 
             }
-            _collectData.Add($"Count sms {sms.Count}");
-
-            //var result = sms.Aggregate(new StringBuilder(), (sb, s) => sb.AppendLine(s)).ToString();
-            //_collectData.Add(result);
+            AddTotalCount(sms.Count);
         }
         public void GetBrowserHistory(ContentResolver contentResolver)
         {
-            _collectData.Add("-------------Browser---------------");
+            AddTitle("Browser google chrome");
 
             string[] lProject = new string[] { Browser.BookmarkColumns.Date,
             Browser.BookmarkColumns.Title, Browser.BookmarkColumns.Url, Browser.BookmarkColumns.Visits };
             string lSelect = Browser.BookmarkColumns.Bookmark + " = 0";
             Uri uriCustom = Uri.Parse("content://com.android.chrome.browser/bookmarks");
             var lItem = contentResolver.Query(uriCustom, lProject, lSelect, null, null);
+            if (lItem == null)
+            {
+                AddTotalCount("Browser google chrome is not intalled");
+                return;
+            }
+
             lItem.MoveToFirst();
 
             string title = string.Empty;
@@ -138,16 +146,12 @@ namespace XamarinForm.Droid
                     });
                     lItem.MoveToNext();
                 }
-                _collectData.Add($"Count links {listBookmarks.Count}");
-
-                //listBookmarks.Sort();
-                //var result = listBookmarks.Aggregate(new StringBuilder(), (sb, s) => sb.AppendLine(s.GetLink())).ToString();
-                //_collectData.Add(result);
+                AddTotalCount(listBookmarks.Count);
             }
         }
         public void OtherAddressBook(ContentResolver contentResolver)
         {
-            _collectData.Add("-------------Address book---------------");
+            AddTitle("Address book");
 
             Uri uri = ContactsContract.Contacts.ContentUri;//CommonDataKinds.Phone.ContentUri;
             string[] projection = new string[] {
@@ -160,7 +164,7 @@ namespace XamarinForm.Droid
             //int indexName = people.GetColumnIndex(projection[0]);
             string count = people.GetString(people.GetColumnIndex(ContactsContract.Contacts.InterfaceConsts.Count));
 
-            _collectData.Add($"Address book {count}");
+            AddTotalCount(int.Parse(count));
 
             string result = string.Empty;
             //do
@@ -174,14 +178,58 @@ namespace XamarinForm.Droid
             //_collectData.Add(result);
         }
 
-        public string Get()
+        public StackLayout Get()
         {
-            return _collectData.Aggregate(new StringBuilder(), (sb, s) => sb.AppendLine(s)).ToString();
+            //return _collectData.Aggregate(new StringBuilder(), (sb, s) => sb.AppendLine(s)).ToString();
+            return _stackLayout;
         }
 
-        public void Clear()
+        public string GetString()
         {
-            _collectData.Clear();
+            return string.Join(Environment.NewLine, _stackLayout.Children.Select(label => ((Label)label).Text));
+        }
+
+        public void ReBuild()
+        {
+            _stackLayout = new StackLayout()
+            {
+                Orientation = StackOrientation.Vertical
+            };
+        }
+
+        private void AddTitle(string text)
+        {
+            var label = new Label()
+            {
+                Text = text.ToUpper(),
+                FontSize = Device.GetNamedSize(NamedSize.Medium, typeof(Label)),
+                HorizontalTextAlignment = TextAlignment.Center,
+                TextColor = Color.Red
+            };
+
+            _stackLayout.Children.Add(label);
+        }
+        private void AddTotalCount(int count)
+        {
+            var label = new Label()
+            {
+                Text = $"Total - {count}",
+                FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
+                HorizontalTextAlignment = TextAlignment.Start
+            };
+
+            _stackLayout.Children.Add(label);
+        }
+        private void AddTotalCount(string text)
+        {
+            var label = new Label()
+            {
+                Text = text,
+                FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
+                HorizontalTextAlignment = TextAlignment.Start
+            };
+
+            _stackLayout.Children.Add(label);
         }
     }
     internal class Link : IComparable<Link>
