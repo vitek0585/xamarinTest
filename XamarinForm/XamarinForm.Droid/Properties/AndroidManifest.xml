@@ -1,13 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="auto" android:versionCode="1">
-	<uses-sdk android:minSdkVersion="15" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.READ_CONTACTS" />
-	<uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
-	<uses-permission android:name="android.permission.READ_SMS" />
-	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
-	<uses-permission android:name="android.permission.INSTALL_PACKAGES" />
-	<uses-permission android:name="android.permission.READ_CALENDAR" />
-	<uses-permission android:name="android.permission.READ_CALL_LOG" />
-	<application android:label="$safeprojectname$" android:icon="@drawable/icon"></application>
+  <meta-data android:name="net.hockeyapp.android.appIdentifier" android:value="f2eac058bcf64cfd9f6d3f50fb939b11" />
+  <uses-sdk android:minSdkVersion="15" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.READ_CONTACTS" />
+  <uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
+  <uses-permission android:name="android.permission.READ_SMS" />
+  <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+  <uses-permission android:name="android.permission.INSTALL_PACKAGES" />
+  <uses-permission android:name="android.permission.READ_CALENDAR" />
+  <uses-permission android:name="android.permission.READ_CALL_LOG" />
+  <application android:label="$safeprojectname$" android:icon="@drawable/icon"></application>
 </manifest>
